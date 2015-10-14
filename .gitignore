@@ -41,3 +41,9 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+src/.vs/Reflow/v14/.suo
+src/__vm/.ReflowOven.vsarduino.h
+src/__vm/.src.vsarduino.h
+src/__vm/Compile.vmps.xml
+src/__vm/Configuration.Debug.vmps.xml
+src/__vm/Upload.vmps.xml
