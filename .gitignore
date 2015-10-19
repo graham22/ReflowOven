@@ -17,33 +17,16 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# =========================
-# Operating System Files
-# =========================
-
-# OSX
-# =========================
-
-.DS_Store
-.AppleDouble
-.LSOverride
-
-# Thumbnails
-._*
-
-# Files that might appear on external disk
-.Spotlight-V100
-.Trashes
-
-# Directories potentially created on remote AFP share
-.AppleDB
-.AppleDesktop
-Network Trash Folder
-Temporary Items
-.apdisk
-src/.vs/Reflow/v14/.suo
-src/__vm/.ReflowOven.vsarduino.h
-src/__vm/.src.vsarduino.h
-src/__vm/Compile.vmps.xml
-src/__vm/Configuration.Debug.vmps.xml
-src/__vm/Upload.vmps.xml
+# Visual Studio/Visual Micro
+*.pe
+*.pdbx
+*.exe
+*.pdb
+*.dll
+*.cache
+*.suo
+*.user
+bin/
+obj/
+__vm/
+.vs/
