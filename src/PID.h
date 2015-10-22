@@ -17,7 +17,8 @@ class PID {
     float updateMe(void);
     float getTemperature(void);
     void setSetpoint(float);
-  
+	void begin(void);
+
   private:
     void compute(void);
     void setOutputLimits(float, float);

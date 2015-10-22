@@ -11,10 +11,18 @@
 class MAX6675 {  
   public:
     MAX6675(int8_t SCLK, int8_t CS, int8_t MISO);
-    float getTemperature(void);
-  private:
-    int8_t sclk, miso, cs;
-    uint8_t spiRead(void);
+	void begin(void);
+	float readCelsius(void);
+	float readFahrenheit(void);
+	// For compatibility with older versions:
+
+private:
+	int8_t _sclk, _miso, _cs;
+	volatile uint8_t *mosiport, *clkport, *csport;
+	uint8_t  mosipinmask, clkpinmask, cspinmask;
+	uint8_t mySPCR;
+	uint8_t spiread(void);
+	uint8_t readdata(void);
 };
 
 

@@ -13,7 +13,7 @@
 #include "UTouch.h"
 #include "UTouchCD.h"
 
-UTouch ctp(5, 8, 6, 7, 2);
+UTouch ctp(CTP_CLK, CTP_CS, CTP_IN, CTP_OUT, CTP_IRK);
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 SplashScreen splash = SplashScreen(&tft, &ctp);
 Screensaver screensaver = Screensaver(&tft, &ctp);
@@ -37,118 +37,127 @@ long lastPrintTime = 0;
 
 
 void setup(void) {
-  Serial.begin(115200);
-  delay(500);
-  tft.begin();
-  ctp.InitTouch(PORTRAIT);
-  ctp.setPrecision(PREC_HI);
-//  if (!ctp.begin(20)) {  // pass in 'sensitivity' coefficient
-//    while (1);
-//  }
-  splash.drawMe();
 
-  
-  tft.fillScreen(ILI9341_BLACK);
-  pid.setSetpoint(0);
-  reflowButton.set("Reflow", 55, 272, 130, 45, 3, &tft, &ctp);
-  cancelButton.set("Cancel", 5, 5, 90, 60, 2, &tft, &ctp);
-  reflowButton.drawMe();
-  isReflowing = false;
-  lastPressedTime = millis();
+	//Serial.begin(115200);
+	// sd card off
+	pinMode(SD_CS, OUTPUT);
+	digitalWrite(SD_CS, HIGH);
+	delay(500);
+	tft.begin();
+	delay(500);
+	pid.begin();
+	ctp.InitTouch(PORTRAIT);
+	ctp.setPrecision(PREC_HI);
+	splash.drawMe();
+	tft.fillScreen(ILI9341_BLACK);
+	pid.setSetpoint(0);
+	reflowButton.set("Reflow", 55, 272, 130, 45, 3, &tft, &ctp);
+	cancelButton.set("Cancel", 5, 5, 90, 60, 2, &tft, &ctp);
+	reflowButton.drawMe();
+	isReflowing = false;
+	lastPressedTime = millis();
 }
 
 
 void loop(void) {
-  if (ctp.dataAvailable()){
-    lastPressedTime = millis();
-  }
-  if (millis() - lastPressedTime > SCREEN_SAVER_LIMIT && !isReflowing){
-    screensaver.drawMe();
-    resetSettings();
-    lastPressedTime = millis();
-  }
-  if (isReflowing){
-    reflow();
-  }
-  else{
-    setReflowButtonActive();
-    settings();
-  }
+
+	if (ctp.dataAvailable()) {
+		lastPressedTime = millis();
+	}
+	if (millis() - lastPressedTime > SCREEN_SAVER_LIMIT && !isReflowing) {
+		screensaver.drawMe();
+		resetSettings();
+		lastPressedTime = millis();
+	}
+
+	//Serial.print("F = ");
+	//Serial.println(pid.getTemperature());
+
+	//delay(1000);
+
+	if (isReflowing) {
+		reflow();
+	}
+	else {
+		setReflowButtonActive();
+		settings();
+	}
 }
 
 
-void reflow(void){
-  float time = (millis()- reflowStartTime)/1000.00;
-  float setpoint = graph.getSetpoint(time);
-  if (cancelButton.updateMe() || setpoint == 0){
-    Serial.print(setpoint);
-    cancel();
-    return;
-  }  
-  pid.setSetpoint(setpoint);
-  float temp = pid.updateMe();
-  if (millis() - lastPrintTime > 1000){
-    lastPrintTime = millis();
-    graph.plotLine(time, temp);
-    graph.printValues(time, temp);
-  }
+void reflow(void) {
+	float time = (millis() - reflowStartTime) / 1000.00;
+	float setpoint = graph.getSetpoint(time);
+	if (cancelButton.updateMe() || setpoint == 0) {
+		cancel();
+		return;
+	}
+	pid.setSetpoint(setpoint);
+	float temp = pid.updateMe();
+	if (millis() - lastPrintTime > 1000) {
+		lastPrintTime = millis();
+		graph.plotLine(time, temp);
+		graph.printValues(time, temp);
+	}
 }
 
 
-void settings(void){
-  preheatSetting.updateMe();
-  soakTempSetting.updateMe();
-  soakTimeSetting.updateMe();
-  rampUpSetting.updateMe();
-  peakTempSetting.updateMe();
-  peakTimeSetting.updateMe();
-  if (reflowButton.updateMe()){
-    beginReflow();
-    reflowStartTime = millis();
-  }
+void settings(void) {
+	preheatSetting.updateMe();
+	soakTempSetting.updateMe();
+	soakTimeSetting.updateMe();
+	rampUpSetting.updateMe();
+	peakTempSetting.updateMe();
+	peakTimeSetting.updateMe();
+	if (reflowButton.updateMe()) {
+		beginReflow();
+		reflowStartTime = millis();
+	}
 }
 
 
-void cancel(void){
-  isReflowing = false;
-  pid.setSetpoint(0);
-  digitalWrite(TOP_ELEMENT, LOW);
-  digitalWrite(BOTTOM_ELEMENT, LOW);
-  resetSettings();
-  lastPressedTime = millis();
+void cancel(void) {
+	isReflowing = false;
+	pid.setSetpoint(0);
+	digitalWrite(TOP_ELEMENT, LOW);
+	digitalWrite(BOTTOM_ELEMENT, LOW);
+	resetSettings();
+	lastPressedTime = millis();
 }
 
 
-void beginReflow(void){
-  isReflowing = true;
-  graph.set(pid.updateMe(), preheatSetting.getValue(), soakTempSetting.getValue(), soakTimeSetting.getValue(), 
-  rampUpSetting.getValue(), peakTempSetting.getValue(), peakTimeSetting.getValue(), &tft, &ctp);
-  tft.fillScreen(ILI9341_BLACK);
-  graph.drawLines();
-  cancelButton.drawMe();
+void beginReflow(void) {
+	isReflowing = true;
+	graph.set(pid.updateMe(), preheatSetting.getValue(), soakTempSetting.getValue(), soakTimeSetting.getValue(),
+		rampUpSetting.getValue(), peakTempSetting.getValue(), peakTimeSetting.getValue(), &tft, &ctp);
+	tft.fillScreen(ILI9341_BLACK);
+	graph.drawLines();
+	cancelButton.drawMe();
+
+
 }
 
 
-void resetSettings(void){
-  tft.fillScreen(ILI9341_BLACK);
-  preheatSetting.drawMe();
-  soakTempSetting.drawMe();
-  soakTimeSetting.drawMe();
-  rampUpSetting.drawMe();
-  peakTempSetting.drawMe();
-  peakTimeSetting.drawMe();
-  setReflowButtonActive();
-  reflowButton.drawMe();
+void resetSettings(void) {
+	tft.fillScreen(ILI9341_BLACK);
+	preheatSetting.drawMe();
+	soakTempSetting.drawMe();
+	soakTimeSetting.drawMe();
+	rampUpSetting.drawMe();
+	peakTempSetting.drawMe();
+	peakTimeSetting.drawMe();
+	setReflowButtonActive();
+	reflowButton.drawMe();
 }
 
 
-void setReflowButtonActive(void){
-  float temp = pid.getTemperature();
-  if (temp >= soakTempSetting.getValue()){
-    reflowButton.setActive(false);
-  }
-  else {
-    reflowButton.setActive(true);
-  }
+void setReflowButtonActive(void) {
+	float temp = pid.getTemperature();
+	if (temp >= soakTempSetting.getValue()) {
+		reflowButton.setActive(false);
+	}
+	else {
+		reflowButton.setActive(true);
+	}
 }
 

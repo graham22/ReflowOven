@@ -28,13 +28,20 @@ struct Point {
 /***************************************************************************
  *                                 Pins                                    *
  ***************************************************************************/
-#define THERMOCOUPLE_SCLK 2
+#define THERMOCOUPLE_SCLK 13
 #define THERMOCOUPLE_CS 3
-#define THERMOCOUPLE_MISO 4
-#define BOTTOM_ELEMENT A0
-#define TOP_ELEMENT A1
+#define THERMOCOUPLE_MISO 12
+#define BOTTOM_ELEMENT 0
+#define TOP_ELEMENT 1
 #define TFT_DC 9
 #define TFT_CS 10
+#define SD_CS 4
+
+#define CTP_CLK 5
+#define CTP_CS 8
+#define CTP_IN 6
+#define CTP_OUT 7
+#define CTP_IRK 2
    
 #endif // CONFIGURATION_h
 

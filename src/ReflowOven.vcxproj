@@ -74,7 +74,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Program Files (x86)\Arduino\hardware\arduino\avr\cores\arduino;C:\Program Files (x86)\Arduino\hardware\arduino\avr\variants\eightanaloginputs;C:\Users\Me\Google Drive\Dev\Github\ReflowOven\src;C:\Users\Me\Google Drive\Dev\Arduino\libraries\Adafruit_GFX_Library;C:\Users\Me\Google Drive\Dev\Arduino\libraries\Adafruit_GFX_Library\utility;C:\Users\Me\Google Drive\Dev\Arduino\libraries\Adafruit_ILI9341;C:\Users\Me\Google Drive\Dev\Arduino\libraries\Adafruit_ILI9341\utility;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\SPI;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\SPI\utility;C:\Users\Me\Google Drive\Dev\Arduino\libraries\UTouch;C:\Users\Me\Google Drive\Dev\Arduino\libraries\UTouch\utility;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\Wire;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\Wire\utility;C:\Program Files (x86)\Arduino\libraries;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries;C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\Extensions\djceu5im.uh3\Micro Platforms\default\debuggers;C:\Users\Me\Google Drive\Dev\Arduino\libraries;C:\Users\Me\Google Drive\Dev\Github\ReflowOven\src;C:\Program Files (x86)\Arduino\hardware\arduino\avr\cores\arduino;C:\Program Files (x86)\Arduino\hardware\arduino\avr\variants\eightanaloginputs;C:\Users\Me\Google Drive\Dev\Arduino\libraries\Adafruit_GFX_Library;C:\Users\Me\Google Drive\Dev\Arduino\libraries\Adafruit_ILI9341;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\SPI;C:\Users\Me\Google Drive\Dev\Arduino\libraries\UTouch;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\Wire;C:\Program Files (x86)\Arduino\libraries;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries;C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\Extensions\djceu5im.uh3\Micro Platforms\default\debuggers;C:\Users\Me\Google Drive\Dev\Arduino\libraries;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\Wire\utility;C:\Program Files (x86)\Arduino\hardware\tools\avr/avr/include/;C:\Program Files (x86)\Arduino\hardware\tools\avr//avr/include/avr/;C:\Program Files (x86)\Arduino\hardware\tools\avr/lib\gcc\avr\4.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files (x86)\Arduino\hardware\arduino\avr\cores\arduino;C:\Program Files (x86)\Arduino\hardware\arduino\avr\variants\eightanaloginputs;C:\Users\Me\Google Drive\Dev\Github\ReflowOven\src;C:\Users\Me\Google Drive\Dev\Arduino\libraries\Adafruit_GFX_Library;C:\Users\Me\Google Drive\Dev\Arduino\libraries\Adafruit_GFX_Library\utility;C:\Users\Me\Google Drive\Dev\Arduino\libraries\Adafruit_ILI9341;C:\Users\Me\Google Drive\Dev\Arduino\libraries\Adafruit_ILI9341\utility;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\SPI;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\SPI\utility;C:\Users\Me\Google Drive\Dev\Arduino\libraries\UTouch;C:\Users\Me\Google Drive\Dev\Arduino\libraries\UTouch\utility;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\Wire;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\Wire\utility;C:\Program Files (x86)\Arduino\libraries;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries;C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\Extensions\djceu5im.uh3\Micro Platforms\default\debuggers;C:\Users\Me\Google Drive\Dev\Arduino\libraries;C:\Program Files (x86)\Arduino\hardware\tools\avr/avr/include/;C:\Program Files (x86)\Arduino\hardware\tools\avr//avr/include/avr/;C:\Program Files (x86)\Arduino\hardware\tools\avr/lib\gcc\avr\4.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>C:\Users\Me\Google Drive\Dev\Github\ReflowOven\src\__vm\.src.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <IgnoreStandardIncludePath>true</IgnoreStandardIncludePath>
       <PreprocessorDefinitions>__AVR_ATmega328p__;__AVR_ATmega328P__;F_CPU=16000000L;ARDUINO=165;ARDUINO_AVR_NANO;ARDUINO_ARCH_AVR;__cplusplus;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -96,10 +96,15 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Disabled</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\Program Files (x86)\Arduino\hardware\arduino\avr\cores\arduino;C:\Program Files (x86)\Arduino\hardware\arduino\avr\variants\eightanaloginputs;C:\Users\Me\Google Drive\Dev\Github\ReflowOven\src;C:\Users\Me\Google Drive\Dev\Arduino\libraries\Adafruit_GFX_Library;C:\Users\Me\Google Drive\Dev\Arduino\libraries\Adafruit_GFX_Library\utility;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\SPI;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\SPI\utility;C:\Users\Me\Google Drive\Dev\Arduino\libraries\UTouch;C:\Users\Me\Google Drive\Dev\Arduino\libraries\UTouch\utility;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\Wire;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\Wire\utility;C:\Program Files (x86)\Arduino\libraries;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries;C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\Extensions\djceu5im.uh3\Micro Platforms\default\debuggers;C:\Users\Me\Google Drive\Dev\Arduino\libraries;C:\Users\Me\Google Drive\Dev\Github\ReflowOven\src;C:\Program Files (x86)\Arduino\hardware\arduino\avr\cores\arduino;C:\Program Files (x86)\Arduino\hardware\arduino\avr\variants\eightanaloginputs;C:\Users\Me\Google Drive\Dev\Arduino\libraries\Adafruit_GFX_Library;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\SPI;C:\Users\Me\Google Drive\Dev\Arduino\libraries\UTouch;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\Wire;C:\Program Files (x86)\Arduino\libraries;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries;C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\Extensions\djceu5im.uh3\Micro Platforms\default\debuggers;C:\Users\Me\Google Drive\Dev\Arduino\libraries;C:\Program Files (x86)\Arduino\hardware\arduino\avr\libraries\Wire\utility;C:\Program Files (x86)\Arduino\hardware\tools\avr/avr/include/;C:\Program Files (x86)\Arduino\hardware\tools\avr//avr/include/avr/;C:\Program Files (x86)\Arduino\hardware\tools\avr/lib\gcc\avr\4.8.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>C:\Users\Me\Google Drive\Dev\Github\ReflowOven\src\__vm\.src.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <IgnoreStandardIncludePath>true</IgnoreStandardIncludePath>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <PreprocessorDefinitions>__AVR_ATmega328p__;__AVR_ATmega328P__;SPI_HAS_TRANSACTION;__AVR__;F_CPU=16000000L;ARDUINO=165;ARDUINO_AVR_NANO;ARDUINO_ARCH_AVR;__cplusplus;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -127,6 +132,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Adafruit_ILI9341.h" />
     <ClInclude Include="Button.h">
       <FileType>CppCode</FileType>
     </ClInclude>
@@ -141,6 +147,7 @@
     <ClInclude Include="__vm\.src.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Adafruit_ILI9341.cpp" />
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="Graph.cpp" />
     <ClCompile Include="Max6675.cpp" />
@@ -152,4 +159,9 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties VM_ADDITIONAL_PREPROC="SPI_HAS_TRANSACTION" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>
