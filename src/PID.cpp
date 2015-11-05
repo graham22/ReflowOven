@@ -51,7 +51,9 @@ float PID::getTemperature(void) {
 
 float PID::updateMe(void) {
 	// turn on the heater if it is time during the window
-	digitalWrite(TOP_ELEMENT, myOutput >= millis() - windowStartTime);
+	bool b = myOutput >= millis() - windowStartTime;
+	digitalWrite(TOP_ELEMENT, b);
+	digitalWrite(BOTTOM_ELEMENT, b);
 	// update the temperature and output every sampleTime milliseconds
 	if (millis() - windowStartTime >= sampleTime) {
 		myInput = thermocouple.readCelsius();
