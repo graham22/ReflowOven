@@ -1,5 +1,3 @@
-#include <UTouch.h>
-#include <UTouchCD.h>
 
 
 // Setting class which contains buttons to increment or decremement parameters of the reflow profile

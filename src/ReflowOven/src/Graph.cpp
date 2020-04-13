@@ -26,7 +26,6 @@ void Graph::set(float startTemp, float preheat, float soakTemp, float soakTime, 
   lastTemp = -1;
 }
 
-
 void Graph::drawLines(void){
   uint16_t hLineColor = ptr_tft->color565(127, 127, 127);
   for (int i = 0; i < 6; i++){
@@ -40,7 +39,6 @@ void Graph::drawLines(void){
   }    
 }
 
-
 float Graph::getSetpoint(float time){
   for (int i = 0; i < 5; i++){
     if (time >= points[i].x && time < points[i+1].x){
@@ -49,7 +47,6 @@ float Graph::getSetpoint(float time){
   }
   return 0;
 }
-
 
 void Graph::printValues(float time, float temp){
   ptr_tft->setTextSize(2);    
@@ -76,11 +73,9 @@ void Graph::printValues(float time, float temp){
   lastTemp = temp;
 }
 
-
 float Graph::floatMap(float x, float in_min, float in_max, float out_min, float out_max){
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
-
 
 float Graph::plotLine(float time, float temp){
   if (lastTime != -1){
@@ -91,14 +86,12 @@ float Graph::plotLine(float time, float temp){
   }
 }
 
-
 void Graph::openDoor(){
   ptr_tft->setTextSize(2);     
   ptr_tft->setTextColor(ILI9341_WHITE);  
   ptr_tft->setCursor(36, 300);
   ptr_tft->print("Open the door!");
 }
-
 
 Point Graph::pointToDisplay(Point display){ // convert real point to point for display
   return (Point) {display.x/2, -display.y+320};

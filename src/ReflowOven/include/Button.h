@@ -1,8 +1,7 @@
-#include <UTouch.h>
-#include <UTouchCD.h>
 
 #include <Adafruit_ILI9341.h>
 #include <Adafruit_GFX.h>
+#include <UTouch.h>
 
 
 // Draw and update the buttons on the LCD
