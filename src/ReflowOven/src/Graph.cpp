@@ -1,4 +1,3 @@
-
 #ifndef GRAPH_cpp
 #define GRAPH_cpp
 
@@ -14,10 +13,8 @@ Graph::Graph(void)
 void Graph::set(float startTemp, float preheat, float soakTemp, float soakTime, float rampUp,
                 float peakTemp, float peakTime, Adafruit_ILI9341 *ptr_tft, UTouch *ptr_ctp)
 {
-
   this->ptr_tft = ptr_tft;
   this->ptr_ctp = ptr_ctp;
-
   points[0] = (Point){0, startTemp};
   points[1] = (Point){(soakTemp - startTemp) / preheat, soakTemp};
   points[2] = (Point){points[1].x + soakTime, soakTemp};
@@ -31,10 +28,8 @@ void Graph::set(float startTemp, float preheat, float soakTemp, float soakTime, 
 
 void Graph::set(float startTemp, float preheat, float sterilizeTemp, float sterilizeTime, Adafruit_ILI9341 *ptr_tft, UTouch *ptr_ctp)
 {
-
   this->ptr_tft = ptr_tft;
   this->ptr_ctp = ptr_ctp;
-
   points[0] = (Point){0, startTemp};
   points[1] = (Point){(sterilizeTemp - startTemp) / preheat, sterilizeTemp};
   points[2] = (Point){points[1].x + sterilizeTime, sterilizeTemp};
@@ -56,7 +51,7 @@ void Graph::drawLines(void)
   {
     Point p0 = pointToDisplay(points[i]);
     Point p1 = pointToDisplay(points[i + 1]);
-    ptr_tft->drawLine(p0.x, p0.y, p1.x, p1.y, setpointLineColor);
+    ptr_tft->drawLine((int16_t) p0.x, (int16_t)p0.y, (int16_t)p1.x, (int16_t)p1.y, setpointLineColor);
   }
 }
 
@@ -115,6 +110,17 @@ void Graph::plotLine(float time, float temp)
   {
     openDoor();
   }
+}
+
+void Graph::plotDot(int16_t time, int16_t temp)
+{
+  int16_t x = time % 240;
+  if (x == 0)
+  {
+    ptr_tft->fillRect(0, 160, 240, 160, ILI9341_BLACK);
+    drawLines();
+  }
+  ptr_tft->drawPixel(x, -temp + 320, ILI9341_RED);
 }
 
 void Graph::openDoor()

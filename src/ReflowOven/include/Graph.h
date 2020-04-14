@@ -21,6 +21,7 @@ public:
   void drawLines(void);
   float getSetpoint(float);
   void plotLine(float, float);
+  void plotDot(int16_t x, int16_t temp);
   void printValues(float, float);
 
 private:

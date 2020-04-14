@@ -34,7 +34,7 @@ Setting peakTempSetting = Setting("Peak temp", "C", 225, 210, 240, 1, 180, &tft,
 Setting peakTimeSetting = Setting("Peak time", "s", 25, 20, 30, 1, 225, &tft, &ctp);
 
 Setting sterilizeTempSetting = Setting("Temperature", "C", 75, 60, 90, 1, 45, &tft, &ctp);
-Setting sterilizeTimeSetting = Setting("Time", "m", 30, 20, 60, 1, 90, &tft, &ctp);
+Setting sterilizeTimeSetting = Setting("Time", "s", 1800, 1200, 2400, 1000, 90, &tft, &ctp);
 
 Graph graph = Graph();
 Button reflowButton = Button();
@@ -46,7 +46,6 @@ ReflowState _state;
 long lastPressedTime = 0;
 long heatStartTime = 0;
 long lastPrintTime = 0;
-
 
 void setStanby()
 {
@@ -87,7 +86,6 @@ void configureSterilizeParameters(void)
 	tft.fillScreen(ILI9341_BLACK);
 	sterilizeTempSetting.drawMe();
 	sterilizeTimeSetting.drawMe();
-	// startButton.setActive(pid.getTemperature() < sterilizeTempSetting.getValue());
 	startButton.setActive(true);
 	startButton.drawMe();
 }
@@ -113,7 +111,7 @@ void beginReflow(void)
 void beginSterilize(void)
 {
 	_state = Sterilize;
-	graph.set(pid.updateMe(), 1.5, sterilizeTempSetting.getValue(), 420, &tft, &ctp);
+	graph.set(sterilizeTempSetting.getValue(), 1, sterilizeTempSetting.getValue(), 480.0, &tft, &ctp);
 	tft.fillScreen(ILI9341_BLACK);
 	graph.drawLines();
 	cancelButton.drawMe();
@@ -166,22 +164,27 @@ void reflow(void)
 
 void sterilize(void)
 {
-	float timeInSeconds = ((millis() - heatStartTime) / 1000.00);
-	float secondsPerPixel = sterilizeTimeSetting.getValue()/220;
-	float xPos = timeInSeconds * secondsPerPixel;
-	float setpoint = graph.getSetpoint(xPos);
-	if (cancelButton.updateMe() || setpoint == 0)
+	if (cancelButton.updateMe())
 	{
 		cancel();
 		return;
 	}
-	pid.setSetpoint(setpoint);
-	float temp = pid.updateMe();
-	if (millis() - lastPrintTime > 1000)
+	float timeInSeconds = ((millis() - heatStartTime) / 1000.00);
+	if ( timeInSeconds < sterilizeTimeSetting.getValue())
 	{
-		lastPrintTime = millis();
-		graph.plotLine(xPos, temp);
-		graph.printValues(timeInSeconds/60, temp);
+		pid.setSetpoint(sterilizeTempSetting.getValue());
+		float temp = pid.updateMe();
+		if (millis() - lastPrintTime > 1000)
+		{
+			lastPrintTime = millis();
+			graph.plotDot(timeInSeconds, temp);
+			graph.printValues(timeInSeconds, temp);
+		}
+	}
+	else
+	{
+		cancel();
+		return;
 	}
 }
 
