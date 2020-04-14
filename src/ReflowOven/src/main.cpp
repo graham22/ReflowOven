@@ -2,19 +2,22 @@
 #include <SPI.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
-
 #include <UTouch.h>
 #include <UTouchCD.h>
 
 #include "PID.h"
-#include "Configuration.h"
+#include "Point.h"
 #include "SplashScreen.h"
 #include "Screensaver.h"
 #include "Button.h"
 #include "Graph.h"
 #include "Setting.h"
+#include "Enumerations.h"
 #include "Adafruit_ILI9341.h"
 
+using namespace ReflowOven;
+
+#define SECONDS_PER_PIXEL 0.111111
 
 UTouch ctp(CTP_CLK, CTP_CS, CTP_IN, CTP_OUT, CTP_IRK);
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
@@ -22,6 +25,7 @@ SplashScreen splash = SplashScreen(&tft, &ctp);
 Screensaver screensaver = Screensaver(&tft, &ctp);
 PID pid(TEMP_PID_Kp, TEMP_PID_Ki, TEMP_PID_Kd, DIRECT);
 
+//Setting name, units, value, minimum, maximum, increment, yLoc, Adafruit_ILI9341, UTouch
 Setting preheatSetting = Setting("Preheat", "C/s", 1.4, 1.3, 1.5, 0.01, 0, &tft, &ctp);
 Setting soakTempSetting = Setting("Soak temp", "C", 150, 140, 180, 1, 45, &tft, &ctp);
 Setting soakTimeSetting = Setting("Soak time", "s", 60, 40, 70, 1, 90, &tft, &ctp);
@@ -29,25 +33,43 @@ Setting rampUpSetting = Setting("Ramp up", "C/s", 0.6, 0.5, 0.7, 0.01, 135, &tft
 Setting peakTempSetting = Setting("Peak temp", "C", 225, 210, 240, 1, 180, &tft, &ctp);
 Setting peakTimeSetting = Setting("Peak time", "s", 25, 20, 30, 1, 225, &tft, &ctp);
 
+Setting sterilizeTempSetting = Setting("Temperature", "C", 75, 60, 90, 1, 45, &tft, &ctp);
+Setting sterilizeTimeSetting = Setting("Time", "m", 30, 20, 60, 1, 90, &tft, &ctp);
+
 Graph graph = Graph();
 Button reflowButton = Button();
+Button sterilizeButton = Button();
+Button startButton = Button();
 Button cancelButton = Button();
-boolean isReflowing = false;
+ReflowState _state;
+
 long lastPressedTime = 0;
-long reflowStartTime = 0;
+long heatStartTime = 0;
 long lastPrintTime = 0;
 
-void setReflowButtonActive(void) {
-	float temp = pid.getTemperature();
-	if (temp >= soakTempSetting.getValue()) {
-		reflowButton.setActive(false);
-	}
-	else {
-		reflowButton.setActive(true);
+
+void setStanby()
+{
+	_state = Standby;
+	tft.fillScreen(ILI9341_BLACK);
+	reflowButton.drawMe();
+	sterilizeButton.drawMe();
+	lastPressedTime = millis();
+}
+
+void checkScreenSaver()
+{
+	if (millis() - lastPressedTime > SCREEN_SAVER_LIMIT)
+	{
+		screensaver.drawMe();
+		_state = Standby;
+		setStanby();
 	}
 }
 
-void resetSettings(void) {
+void configureReflowParameters(void)
+{
+	_state = ConfigureReflow;
 	tft.fillScreen(ILI9341_BLACK);
 	preheatSetting.drawMe();
 	soakTempSetting.drawMe();
@@ -55,59 +77,116 @@ void resetSettings(void) {
 	rampUpSetting.drawMe();
 	peakTempSetting.drawMe();
 	peakTimeSetting.drawMe();
-	setReflowButtonActive();
-	reflowButton.drawMe();
+	startButton.setActive(pid.getTemperature() < soakTempSetting.getValue());
+	startButton.drawMe();
 }
 
-void cancel(void) {
-	isReflowing = false;
+void configureSterilizeParameters(void)
+{
+	_state = ConfigureSterilize;
+	tft.fillScreen(ILI9341_BLACK);
+	sterilizeTempSetting.drawMe();
+	sterilizeTimeSetting.drawMe();
+	// startButton.setActive(pid.getTemperature() < sterilizeTempSetting.getValue());
+	startButton.setActive(true);
+	startButton.drawMe();
+}
+
+void cancel(void)
+{
 	pid.setSetpoint(0);
 	digitalWrite(TOP_ELEMENT, LOW);
 	digitalWrite(BOTTOM_ELEMENT, LOW);
-	resetSettings();
-	lastPressedTime = millis();
+	setStanby();
 }
 
-void beginReflow(void) {
-	isReflowing = true;
+void beginReflow(void)
+{
+	_state = Reflow;
 	graph.set(pid.updateMe(), preheatSetting.getValue(), soakTempSetting.getValue(), soakTimeSetting.getValue(),
-		rampUpSetting.getValue(), peakTempSetting.getValue(), peakTimeSetting.getValue(), &tft, &ctp);
+			  rampUpSetting.getValue(), peakTempSetting.getValue(), peakTimeSetting.getValue(), &tft, &ctp);
 	tft.fillScreen(ILI9341_BLACK);
 	graph.drawLines();
 	cancelButton.drawMe();
 }
 
-void settings(void) {
+void beginSterilize(void)
+{
+	_state = Sterilize;
+	graph.set(pid.updateMe(), 1.5, sterilizeTempSetting.getValue(), 420, &tft, &ctp);
+	tft.fillScreen(ILI9341_BLACK);
+	graph.drawLines();
+	cancelButton.drawMe();
+}
+
+void processReflowParameters(void)
+{
 	preheatSetting.updateMe();
 	soakTempSetting.updateMe();
 	soakTimeSetting.updateMe();
 	rampUpSetting.updateMe();
 	peakTempSetting.updateMe();
 	peakTimeSetting.updateMe();
-	if (reflowButton.updateMe()) {
+	if (startButton.updateMe())
+	{
 		beginReflow();
-		reflowStartTime = millis();
+		heatStartTime = millis();
 	}
 }
 
-void reflow(void) {
-	float time = (millis() - reflowStartTime) / 1000.00;
+void processSterilizeParameters(void)
+{
+	sterilizeTempSetting.updateMe();
+	sterilizeTimeSetting.updateMe();
+	if (startButton.updateMe())
+	{
+		beginSterilize();
+		heatStartTime = millis();
+	}
+}
+
+void reflow(void)
+{
+	float time = (millis() - heatStartTime) / 1000.00;
 	float setpoint = graph.getSetpoint(time);
-	if (cancelButton.updateMe() || setpoint == 0) {
+	if (cancelButton.updateMe() || setpoint == 0)
+	{
 		cancel();
 		return;
 	}
 	pid.setSetpoint(setpoint);
 	float temp = pid.updateMe();
-	if (millis() - lastPrintTime > 1000) {
+	if (millis() - lastPrintTime > 1000)
+	{
 		lastPrintTime = millis();
 		graph.plotLine(time, temp);
 		graph.printValues(time, temp);
 	}
 }
 
-void setup(void) {
-	Serial.begin(115200);
+void sterilize(void)
+{
+	float timeInSeconds = ((millis() - heatStartTime) / 1000.00);
+	float secondsPerPixel = sterilizeTimeSetting.getValue()/220;
+	float xPos = timeInSeconds * secondsPerPixel;
+	float setpoint = graph.getSetpoint(xPos);
+	if (cancelButton.updateMe() || setpoint == 0)
+	{
+		cancel();
+		return;
+	}
+	pid.setSetpoint(setpoint);
+	float temp = pid.updateMe();
+	if (millis() - lastPrintTime > 1000)
+	{
+		lastPrintTime = millis();
+		graph.plotLine(xPos, temp);
+		graph.printValues(timeInSeconds/60, temp);
+	}
+}
+
+void setup(void)
+{
 	// sd card off
 	pinMode(SD_CS, OUTPUT);
 	digitalWrite(SD_CS, HIGH);
@@ -115,38 +194,60 @@ void setup(void) {
 	tft.begin();
 	delay(500);
 	pid.begin();
+	pid.setSetpoint(0);
 	ctp.InitTouch(PORTRAIT);
 	ctp.setPrecision(PREC_HI);
-	splash.drawMe();
+	splash.drawMe(); // waits here for someone to touch
 	tft.fillScreen(ILI9341_BLACK);
-	pid.setSetpoint(0);
-	reflowButton.set("Reflow", 55, 272, 125, 45, 3, &tft, &ctp);
+	startButton.set("Start", 55, 272, 125, 45, 3, &tft, &ctp); // name, xLoc, yLoc, width, height, textSize, Adafruit_ILI9341*, UTouch*
 	cancelButton.set("Cancel", 5, 5, 90, 60, 2, &tft, &ctp);
+	reflowButton.set("Reflow", 20, 115, 200, 45, 3, &tft, &ctp);
+	sterilizeButton.set("Sterilize", 20, 180, 200, 45, 3, &tft, &ctp);
+	_state = Standby;
 	reflowButton.drawMe();
-	isReflowing = false;
+	sterilizeButton.drawMe();
 	lastPressedTime = millis();
 }
 
-void loop(void) {
-
-	if (ctp.dataAvailable()) {
-		lastPressedTime = millis();
-	}
-	if (millis() - lastPressedTime > SCREEN_SAVER_LIMIT && !isReflowing) {
-		screensaver.drawMe();
-		resetSettings();
+void loop(void)
+{
+	if (ctp.dataAvailable())
+	{
 		lastPressedTime = millis();
 	}
 
-	//Serial.print("F = ");
-	//Serial.println(pid.getTemperature());
-	//delay(1000);
-
-	if (isReflowing) {
+	switch (_state)
+	{
+	case Standby:
+		checkScreenSaver();
+		if (reflowButton.updateMe())
+		{
+			_state = ConfigureReflow;
+			configureReflowParameters();
+		}
+		if (sterilizeButton.updateMe())
+		{
+			_state = ConfigureSterilize;
+			configureSterilizeParameters();
+		}
+		break;
+	case ConfigureReflow:
+		checkScreenSaver();
+		processReflowParameters();
+		break;
+	case ConfigureSterilize:
+		checkScreenSaver();
+		processSterilizeParameters();
+		break;
+	case Reflow:
 		reflow();
+		break;
+	case Sterilize:
+		sterilize();
+		break;
+	case Complete:
+		checkScreenSaver();
+		break;
 	}
-	else {
-		setReflowButtonActive();
-		settings();
-	}
+
 }
