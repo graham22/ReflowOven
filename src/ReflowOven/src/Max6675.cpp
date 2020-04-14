@@ -9,15 +9,18 @@
 #include "Max6675.h"
 #include <SPI.h>
 
+namespace ReflowOven
+{
 /* Constructor- configure pins */
-MAX6675::MAX6675(int8_t SCLK, int8_t CS, int8_t MISO) {
-  _sclk = SCLK;
-  _cs = CS;
-  _miso = MISO;
-  //pinMode(cs, OUTPUT);
-  //pinMode(sclk, OUTPUT); 
-  //pinMode(miso, INPUT);
-  //digitalWrite(cs, HIGH);
+MAX6675::MAX6675(int8_t SCLK, int8_t CS, int8_t MISO)
+{
+	_sclk = SCLK;
+	_cs = CS;
+	_miso = MISO;
+	//pinMode(cs, OUTPUT);
+	//pinMode(sclk, OUTPUT);
+	//pinMode(miso, INPUT);
+	//digitalWrite(cs, HIGH);
 }
 
 // If the SPI library has transaction support, these functions
@@ -25,11 +28,13 @@ MAX6675::MAX6675(int8_t SCLK, int8_t CS, int8_t MISO) {
 // libraries.  Otherwise, they simply do nothing.
 #ifdef SPI_HAS_TRANSACTION
 static inline void spi_begin(void) __attribute__((always_inline));
-static inline void spi_begin(void) {
+static inline void spi_begin(void)
+{
 	SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
 }
 static inline void spi_end(void) __attribute__((always_inline));
-static inline void spi_end(void) {
+static inline void spi_end(void)
+{
 	SPI.endTransaction();
 }
 #else
@@ -37,13 +42,14 @@ static inline void spi_end(void) {
 #define spi_end()
 #endif
 
-void MAX6675::begin(void) {
+void MAX6675::begin(void)
+{
 
 	pinMode(_cs, OUTPUT);
 	csport = portOutputRegister(digitalPinToPort(_cs));
 	cspinmask = digitalPinToBitMask(_cs);
 
-#if defined (__AVR__)
+#if defined(__AVR__)
 	SPI.begin();
 	SPI.setClockDivider(SPI_CLOCK_DIV2); // 8 MHz (full! speed!)
 	SPI.setBitOrder(MSBFIRST);
@@ -54,28 +60,29 @@ void MAX6675::begin(void) {
 	SPI.setClockDivider(SPI_CLOCK_DIV2); // 8 MHz (full! speed!)
 	SPI.setBitOrder(MSBFIRST);
 	SPI.setDataMode(SPI_MODE0);
-#elif defined (__arm__)
+#elif defined(__arm__)
 	SPI.begin();
 	SPI.setClockDivider(11); // 8-ish MHz (full! speed!)
 	SPI.setBitOrder(MSBFIRST);
 	SPI.setDataMode(SPI_MODE0);
 #endif
-
 }
 
-uint8_t MAX6675::spiread(void) {
+uint8_t MAX6675::spiread(void)
+{
 	uint8_t r = 0;
 
-#if defined (__AVR__)
+#if defined(__AVR__)
 	uint8_t backupSPCR = SPCR;
 	SPCR = mySPCR;
 	SPDR = 0x00;
-	while (!(SPSR & _BV(SPIF)));
+	while (!(SPSR & _BV(SPIF)))
+		;
 	r = SPDR;
 	SPCR = backupSPCR;
 #elif defined(TEENSYDUINO)
 	r = SPI.transfer(0x00);
-#elif defined (__arm__)
+#elif defined(__arm__)
 	SPI.setClockDivider(11); // 8-ish MHz (full! speed!)
 	SPI.setBitOrder(MSBFIRST);
 	SPI.setDataMode(SPI_MODE0);
@@ -85,14 +92,13 @@ uint8_t MAX6675::spiread(void) {
 	return r;
 }
 
-uint8_t MAX6675::readdata(void) {
+uint8_t MAX6675::readdata(void)
+{
 	digitalWrite(_cs, LOW);
 	uint8_t r = spiread();
 	digitalWrite(_cs, HIGH);
 	return r;
 }
-
-
 
 //float MAX6675::readCelsius(void) {
 //	uint16_t v;
@@ -100,7 +106,8 @@ uint8_t MAX6675::readdata(void) {
 //	return v*0.4;  // convert from raw to celsius
 //}
 
-float MAX6675::readCelsius(void) {
+float MAX6675::readCelsius(void)
+{
 
 	uint16_t v;
 
@@ -113,7 +120,8 @@ float MAX6675::readCelsius(void) {
 
 	digitalWrite(_cs, HIGH);
 
-	if (v & 0x4) {
+	if (v & 0x4)
+	{
 		// uh oh, no thermocouple attached!
 		/*return NAN;*/
 		return -100;
@@ -121,10 +129,11 @@ float MAX6675::readCelsius(void) {
 
 	v >>= 3;
 
-	return v*0.25;
+	return v * 0.25;
 }
 
-float MAX6675::readFahrenheit(void) {
+float MAX6675::readFahrenheit(void)
+{
 	return readCelsius() * 9.0 / 5.0 + 32;
 }
 
@@ -147,6 +156,6 @@ float MAX6675::readFahrenheit(void) {
 //
 //	return d;
 //}
+} // namespace ReflowOven
 
 #endif // MAX6675_cpp
-

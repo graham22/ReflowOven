@@ -7,11 +7,12 @@
 
 #include "Arduino.h"
 #include "PID.h"
-#include "Configuration.h"
 
-
+namespace ReflowOven
+{
 PID::PID(float kp, float ki, float kd, int controllerDirection)
-	:thermocouple(THERMOCOUPLE_SCLK, THERMOCOUPLE_CS, THERMOCOUPLE_MISO) {
+	: thermocouple(THERMOCOUPLE_SCLK, THERMOCOUPLE_CS, THERMOCOUPLE_MISO)
+{
 	sampleTime = TEMP_UPDATE_INTERVAL;
 	windowStartTime = 0;
 	PID::setOutputLimits(0, TEMP_UPDATE_INTERVAL);
@@ -19,14 +20,19 @@ PID::PID(float kp, float ki, float kd, int controllerDirection)
 	PID::setTunings(kp, ki, kd);
 	pinMode(BOTTOM_ELEMENT, OUTPUT);
 	pinMode(TOP_ELEMENT, OUTPUT);
+
 }
 
-void PID::begin(void) {
+void PID::begin(void)
+{
+	digitalWrite(TOP_ELEMENT, LOW);
+	digitalWrite(BOTTOM_ELEMENT, LOW);
 	thermocouple.begin();
 }
 
 /* Update the output to the PID */
-void PID::compute(void) {
+void PID::compute(void)
+{
 	// Compute the error variables
 	float error = mySetpoint - myInput;
 	iTerm += (ki * error);
@@ -35,12 +41,13 @@ void PID::compute(void) {
 	// compute the output
 	myOutput = kp * error + iTerm - kd * dInput;
 	myOutput = constrain(myOutput, outMin, outMax);
-	lastInput = myInput;  // store the input for the next call to compute
+	lastInput = myInput; // store the input for the next call to compute
 }
 
-
-float PID::getTemperature(void) {
-	if (millis() - windowStartTime >= sampleTime) {
+float PID::getTemperature(void)
+{
+	if (millis() - windowStartTime >= sampleTime)
+	{
 		myInput = thermocouple.readCelsius();
 		PID::compute();
 		windowStartTime = millis();
@@ -48,14 +55,15 @@ float PID::getTemperature(void) {
 	return myInput;
 }
 
-
-float PID::updateMe(void) {
+float PID::updateMe(void)
+{
 	// turn on the heater if it is time during the window
 	bool b = myOutput >= millis() - windowStartTime;
 	digitalWrite(TOP_ELEMENT, b);
 	digitalWrite(BOTTOM_ELEMENT, b);
 	// update the temperature and output every sampleTime milliseconds
-	if (millis() - windowStartTime >= sampleTime) {
+	if (millis() - windowStartTime >= sampleTime)
+	{
 		myInput = thermocouple.readCelsius();
 		PID::compute();
 		windowStartTime = millis();
@@ -63,30 +71,33 @@ float PID::updateMe(void) {
 	return myInput;
 }
 
-
-void PID::setSetpoint(float newSetpoint) {
+void PID::setSetpoint(float newSetpoint)
+{
 	mySetpoint = newSetpoint;
 }
 
-
-void PID::setTunings(float p, float i, float d) {
-	if (p < 0 || i < 0 || d < 0) {
+void PID::setTunings(float p, float i, float d)
+{
+	if (p < 0 || i < 0 || d < 0)
+	{
 		return;
 	}
 	float sampleTimeInSec = ((float)sampleTime) / 1000;
 	kp = p;
-	ki = i*sampleTimeInSec;
+	ki = i * sampleTimeInSec;
 	kd = d / sampleTimeInSec;
-	if (controllerDirection == REVERSE) {
+	if (controllerDirection == REVERSE)
+	{
 		kp *= -1;
 		ki *= -1;
 		kd *= -1;
 	}
 }
 
-
-void PID::setSampleTime(int newSampleTime) {
-	if (newSampleTime <= 0) {
+void PID::setSampleTime(int newSampleTime)
+{
+	if (newSampleTime <= 0)
+	{
 		return;
 	}
 	float ratio = (float)newSampleTime / (float)sampleTime;
@@ -95,9 +106,10 @@ void PID::setSampleTime(int newSampleTime) {
 	sampleTime = (unsigned long)newSampleTime;
 }
 
-
-void PID::setOutputLimits(float newMin, float newMax) {
-	if (newMin >= newMax) {
+void PID::setOutputLimits(float newMin, float newMax)
+{
+	if (newMin >= newMax)
+	{
 		return;
 	}
 	outMin = newMin;
@@ -106,15 +118,16 @@ void PID::setOutputLimits(float newMin, float newMax) {
 	iTerm = constrain(iTerm, outMin, outMax);
 }
 
-
-void PID::setControllerDirection(int newDirection) {
-	if (newDirection != controllerDirection) {
+void PID::setControllerDirection(int newDirection)
+{
+	if (newDirection != controllerDirection)
+	{
 		kp *= -1;
 		ki *= -1;
 		kd *= -1;
 	}
 	controllerDirection = newDirection;
 }
+} // namespace ReflowOven
 
 #endif
-
