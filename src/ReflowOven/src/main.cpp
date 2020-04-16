@@ -190,7 +190,7 @@ void sterilize(void)
 
 void setup(void)
 {
-	// sd card off
+	// not using SD card
 	pinMode(SD_CS, OUTPUT);
 	digitalWrite(SD_CS, HIGH);
 	delay(500);
