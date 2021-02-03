@@ -76,7 +76,7 @@ void configureReflowParameters(void)
 	rampUpSetting.drawMe();
 	peakTempSetting.drawMe();
 	peakTimeSetting.drawMe();
-	startButton.setActive(pid.getTemperature() < soakTempSetting.getValue());
+	startButton.setActive(true);
 	startButton.drawMe();
 }
 
