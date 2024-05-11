@@ -30,3 +30,4 @@ bin/
 obj/
 __vm/
 .vs/
+/src/ReflowOven/.vscode
